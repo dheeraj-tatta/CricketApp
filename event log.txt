@@ -1,0 +1,16 @@
+
+- changed date & time format for better readability.
+
+- Team names longer than 21 chars would get abbreviated.
+
+-1. no toss, no data
+
+0. Match announced, toss happened: squad announced
+
+0.1 0. Match announced, toss happened: squad  not announced
+
+1. if(match_started): scoring begins
+
+2. no test matches, only intl teams
+
+3. Meaningful title
