@@ -70,60 +70,20 @@ import RC.model;
 
         listener = new adapter.RecyclerViewClickListener() {
             @Override
-            public void onClick(View v, int position){
-                Intent i = new Intent(getApplicationContext(),MatchDesc.class);
-                i.putExtra("ss",modelList.get(position).isSs());
-                i.putExtra("toss",modelList.get(position).getToss());
-                i.putExtra("win_team",modelList.get(position).getWt());
-                i.putExtra("uid",modelList.get(position).getUid());
-                Intent carrier = new Intent(getApplicationContext(),MainActivity.class);
-                carrier.putExtra("uid",modelList.get(position).getUid());
-                Intent summary_intent = new Intent(getApplicationContext(),Summary.class);
+            public void onClick(View v, int position) {
 
-                Intent receiver2 = getIntent();
-                String M_Data = receiver2.getStringExtra("api_response");
-//                JSONObject match_data = new JSONObject(M_Data);
-                //send details to summary class from new api call
-                //maybe creating a json object in summary class would helo etter
-                summary_intent.putExtra("response",M_Data);
-
+                Intent i = new Intent(getApplicationContext(), MatchDesc.class);
+                i.putExtra("ss", modelList.get(position).isSs());
+                i.putExtra("toss", modelList.get(position).getToss());
+                i.putExtra("win_team", modelList.get(position).getWt());
+                i.putExtra("uid", modelList.get(position).getUid());
+                i.putExtra("squad",modelList.get(position).getSquad());
                 startActivity(i);
             }
-
-            public void getMatchData(){
-                Intent receiver = getIntent();
-                int uid = receiver.getIntExtra("uid",0);
-                String data_url = "https://cricapi.com/api/fantasySummary?apikey=Oi11keKppSQHtbRaSOW3MX9mcv62&unique_id="+uid;
-                StringRequest data_req = new StringRequest(Request.Method.GET, data_url, new Response.Listener<String>() {
-//                    String def_reponse = "{\"type\":\"empty\"}"; tried covering an edge case but it may not exist at all todo:on exception, consider this
-
-                    @Override
-                    public void onResponse(String response) {
-                        try {
-                            JSONObject data = new JSONObject(response);
-                            Intent carrier2 = new Intent(getApplicationContext(),MainActivity.class);
-                            carrier2.putExtra("api_response", String.valueOf(data));
-
-                        }
-                        catch (Exception e){
-                            Toast.makeText(getApplicationContext(),"LINE 105, main",Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                }, new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        Toast.makeText(getApplicationContext(),"LINE 111, main",Toast.LENGTH_SHORT).show();
-                    }
-                });
-                RequestQueue rq = Volley.newRequestQueue(getApplicationContext());
-                rq.add(data_req);
-                //return api response
-                return;
-            }
         };
-        String url = "https://cricapi.com/api/matches?apikey=Oi11keKppSQHtbRaSOW3MX9mcv62";
-
-        Toast.makeText(getApplicationContext(), "Toast 1", Toast.LENGTH_SHORT).show();
+        String url = "https://cricapi.com/api/matches?apikey=LDkgcBaZQGhywGDQMK3grJuBs652";
+//my key = Oi11keKppSQHtbRaSOW3MX9mcv62
+//        Toast.makeText(getApplicationContext(), "Toast 1", Toast.LENGTH_SHORT).show();
 
         StringRequest request = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
 
@@ -134,17 +94,19 @@ import RC.model;
                 try {
                     int i =0;
                     String ct1, ct2;
-                    Toast.makeText(getApplicationContext(), "Toast 2", Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(getApplicationContext(), "Toast 2", Toast.LENGTH_SHORT).show();
                     JSONObject jsonObject = new JSONObject(response);
 
                     JSONArray jsonArray = jsonObject.getJSONArray("matches");
-                    Toast.makeText(getApplicationContext(), ""+jsonArray.length(), Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(getApplicationContext(),"JSON Array fetched",Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(getApplicationContext(), ""+jsonArray.length(), Toast.LENGTH_SHORT).show();
                     for (i = 0; i < jsonArray.length(); i++) {
 //                        Toast.makeText(getApplicationContext(), ""+jsonArray.length(), Toast.LENGTH_SHORT).show();
                         JSONObject object = jsonArray.getJSONObject(i);
                         int uid = object.getInt("unique_id");
                         String t1 = object.getString("team-1");
                         ct1 = t1.toLowerCase();
+                        Boolean squad = object.getBoolean("squad");
                         String t2 = object.getString("team-2");
                         ct2 = t2.toLowerCase();
                         boolean ss = object.getBoolean("matchStarted");
@@ -169,11 +131,11 @@ import RC.model;
                         T += "   @  ";
                         T += d.substring(11, 16);
 //                        Toast.makeText(getApplicationContext(), "Toast B", Toast.LENGTH_SHORT).show();
-                        if(check(ct1,ct2)) {
-                            model mobj = new model(uid, t1, t2, T, ss, toss,wt);
+//                        if(check(ct1,ct2)) {
+                            model mobj = new model(uid, t1, t2, T, ss, toss,wt,squad);
 //                        Toast.makeText(getApplicationContext(), "Toast C", Toast.LENGTH_SHORT).show();
                             modelList.add(mobj);
-                        }
+//                        }
 //                        Toast.makeText(getApplicationContext(), "Toast D", Toast.LENGTH_SHORT).show();
                         recyclerView.setAdapter(adapter);
                     }
@@ -193,14 +155,14 @@ import RC.model;
                 }
         );
 
-        Toast.makeText(getApplicationContext(), "Toast 7", Toast.LENGTH_SHORT).show();
+//        Toast.makeText(getApplicationContext(), "Toast 7", Toast.LENGTH_SHORT).show();
         RequestQueue rq = Volley.newRequestQueue(this);
         rq.add(request);
 
     }
 
     private boolean check(String ct1, String ct2) {
-        return teamList.contains(ct1) || teamList.contains(ct2);
+        return teamList.contains(ct1) && teamList.contains(ct2);
     }
 //    private void setAdapter() {
 //
